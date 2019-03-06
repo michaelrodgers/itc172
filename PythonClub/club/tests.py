@@ -1,6 +1,7 @@
 from django.test import TestCase
 from .models import Meeting, Minutes, Resource, Event
 from .forms import MeetingForm
+from datetime import datetime
 from django.urls import reverse
 
 # Create your tests here.
@@ -48,17 +49,33 @@ class TestIndex(TestCase):
 
     def test_view_uses_correct_template(self):
         response = self.client.get(reverse('index'))
+        self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'club/index.html')
+
+class TestGetMeeting(TestCase):
+
+    def test_view_url_exists_at_desired_location(self):
+        response = self.client.get('/club/meetings', follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_url_accessible_by_name(self):
+        response = self.client.get(reverse('meetings'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_view_uses_correct_template(self):
+        response = self.client.get(reverse('meetings'))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'club/meetings.html')
 
 class New_Meeting_Form_Test(TestCase):
 
     #Valid Form Data
     def test_MeetingForm_is_valid(self):
-        form = MeetingForm(data={'meetingtitle': "Tests", 'meetingdate': "2019-02-27", 'meetinglocation': "Broadway Edison Building", 'Agenda': "Test forms"})
+        form = MeetingForm(data={'meetingtitle': "Models", 'meetingdate': "2019-01-23", 'meetinglocation': "Broadway Edison Building", 'agenda': "Create Model Classes, Register Model Classes with Admin, Migrate Models, and Create Superuser"})
         self.assertTrue(form.is_valid())
 
     #Invalid Form Data
     def test_MeetingForm_invalid(self):
-        form = MeetingForm(data={'meetingtitle': "Tests", 'meetingdate': "2019-02-27", 'meetinglocation': "Broadway Edison Building", 'Agenda': "Test forms"})
+        form = MeetingForm(data={'meetingtitle': "Tests", 'meetingdate': "2019-02-27", 'meetinglocation': "Broadway Edison Building", 'agenda': "Test forms"})
         self.assertFalse(form.is_valid())
 
